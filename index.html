@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MeisterHub | 경북권 마이스터 종합 대시보드</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="main-header">
+    <div class="logo">🚀 Meister<span>Hub</span></div>
+    <nav class="nav-links">
+      <button id="nav-job" class="nav-btn active" onclick="switchTab('job')">취업지원공간</button>
+      <button id="nav-contest" class="nav-btn" onclick="switchTab('contest')">대회·공모전</button>
+      <button id="nav-spec" class="nav-btn" onclick="switchTab('spec')">스펙 분석</button>
+    </nav>
+    <div class="user-profile">
+      <span class="user-badge">Meister</span>
+      <strong>취업준비생</strong>님
+    </div>
+  </header>
+
+  <main class="dashboard-container">
+    
+    <div id="tab-job" class="tab-content active-tab">
+      <div class="tab-layout">
+        <section class="left-panel">
+          <div class="profile-summary-card">
+            <h3>📊 실시간 취업 인프라 연동</h3>
+            <p class="subtitle">공공데이터포털 연동 상태 점검</p>
+            <div class="match-score-box">
+              <div class="score-title">API 연결 상태</div>
+              <div class="status-indicator">
+                <span class="status-dot online"></span>
+                <span class="status-text">온라인</span>
+              </div>
+              <p class="score-tip">💡 카드를 클릭하면 실시간 기업 연봉, 매출, 블라인드/잡플래닛 평점 정보가 로드됩니다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="right-panel">
+          <div class="panel-header">
+            <h2>🎯 마이스터고 핵심 목표 직무 선택</h2>
+            <div class="filter-group">
+              <button class="filter-btn active" onclick="filterByJob('all')">전체보기 (25)</button>
+              <button class="filter-btn" onclick="filterByJob('machine')">⚙️ 기계/자동차</button>
+              <button class="filter-btn" onclick="filterByJob('semi')">📟 반도체</button>
+              <button class="filter-btn" onclick="filterByJob('battery')">🔋 2차전지</button>
+              <button class="filter-btn" onclick="filterByJob('defense')">🛡️ 방산</button>
+              <button class="filter-btn" onclick="filterByJob('public')">🏢 공기업/공공</button>
+            </div>
+          </div>
+          <div id="contestGrid" class="contest-grid"></div>
+        </section>
+      </div>
+    </div>
+
+    <div id="tab-contest" class="tab-content">
+      <div class="single-layout">
+        <div class="panel-header">
+          <h2>🏆 마이스터고 가산점 보장 주요 대회 · 공모전</h2>
+          <p class="subtitle">대기업 고졸 채용 시 서류 가산점 및 면접 치트키로 작용하는 실제 공식 대회 리스트입니다.</p>
+        </div>
+        <div class="contest-grid-custom" id="officialContestGrid"></div>
+      </div>
+    </div>
+
+    <div id="tab-spec" class="tab-content">
+      <div class="single-layout">
+        <div class="panel-header">
+          <h2>🎯 경북권 마이스터고 전용 초정밀 스펙 진단기</h2>
+          <p class="subtitle">학과별 최신 기능사 트렌드와 산업기사, 대외활동 실적을 종합 계산합니다.</p>
+        </div>
+        
+        <div class="spec-analyzer-box">
+          <div class="form-group">
+            <label>🏫 재학 중인 학교 선택</label>
+            <select id="spec-school">
+              <option value="gumi">구미전자공업고등학교</option>
+              <option value="geumo">금오공업고등학교</option>
+              <option value="gb-master">경북기계명장고등학교</option>
+              <option value="nuclear">한국원자력마이스터고등학교</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>📐 전공 학과 선택</label>
+            <select id="spec-dept" onchange="updateDynamicCertificates()">
+              <option value="machine">기계·자동화과 계열</option>
+              <option value="electronics">전자·전기과 계열</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>📈 학교 내신 석차 등급 (3학년 1학기 누적 기준)</label>
+            <select id="spec-grade">
+              <option value="1">1등급 이내 (상위 10% 이내 - 최상위권)</option>
+              <option value="2">2등급 이내 (상위 20% 이내 - 우수권)</option>
+              <option value="3">3~4등급 (평균권)</option>
+              <option value="5">5등급 이하 (노력 요함)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>🛠️ 취득 자격증 선택 (전공 맞춤형 핵심 기능사 & 산업기사)</label>
+            <div id="dynamic-cert-list" class="cert-checkbox-grid">
+              </div>
+          </div>
+
+          <div class="form-group">
+            <label>💼 공통 우대 가산점 자격증 (중복 선택 가능)</label>
+            <div class="cert-checkbox-grid">
+              <label class="check-item"><input type="checkbox" class="add-cert" value="kor-history"> 한국사능력검정시험 (3급 이상)</label>
+              <label class="check-item"><input type="checkbox" class="add-cert" value="com-wp"> 컴퓨터활용능력 또는 워드</label>
+              <label class="check-item"><input type="checkbox" class="add-cert" value="toeic"> 토익 700점 이상 / 토스 (IM 이상)</label>
+              <label class="check-item"><input type="checkbox" class="add-cert" value="chemical"> 위험물기능사 (공통 우대)</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>💪 누적 봉사활동 시간</label>
+            <select id="spec-volunteer">
+              <option value="0">20시간 미만 (기본 성실도)</option>
+              <option value="20">20시간 이상 ~ 50시간 미만</option>
+              <option value="50">50시간 이상 ~ 100시간 미만 (우수)</option>
+              <option value="100">100시간 이상 (대기업·공기업 가산점 확정)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>📣 공모전 및 프로젝트 대외활동 경험 (중복 선택 가능)</label>
+            <div class="cert-checkbox-grid">
+              <label class="check-item"><input type="checkbox" class="activity-check" value="contest-entry"> 교외 공모전/경진대회 출품 경험</label>
+              <label class="check-item"><input type="checkbox" class="activity-check" value="project-lead"> 교내·외 캡스톤/팀 프로젝트 리더 경험</label>
+              <label class="check-item"><input type="checkbox" class="activity-check" value="club-act"> 전공 심화 전공동아리 학술 활동</label>
+              <label class="check-item"><input type="checkbox" class="activity-check" value="externship"> 기업 연계 현장 실습(인턴십) 이수</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>🏆 주요 대회 수상 실적 (가장 높은 격 상위 1개 선택)</label>
+            <select id="spec-award">
+              <option value="none">수상 실적 없음 / 준비 중</option>
+              <option value="school">교내 경진대회 및 우수 장학생 수상</option>
+              <option value="city">시·군 규모 대회 수상 (구미시 등)</option>
+              <option value="provincial">도 규모 대회 수상 (지방기능경기대회 등)</option>
+              <option value="national">전국 규모 대회 수상 (전국기능경기대회 / IP Meister 등)</option>
+            </select>
+          </div>
+
+          <button class="primary-btn" onclick="analyzeAdvancedSpec()" style="margin-top: 10px;">
+            경북 마이스터 맞춤형 프리미엄 진단 시작 🔍
+          </button>
+
+          <div id="spec-result" class="spec-result-view" style="display: none;">
+            <h4>📊 경북권 마이스터 매칭 종합 분석 보고서</h4>
+            <p id="spec-result-text"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="companyModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="modal-badge-row">
+            <span id="mScale" class="modal-badge">대기업</span>
+            <span class="modal-badge-sub">🔒 인증 데이터</span>
+          </div>
+          <h2 id="mCompanyName">기업명</h2>
+        </div>
+        <button class="close-btn" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="mTitle" class="modal-title-desc">모집 전형</p>
+        <div class="info-grid">
+          <div class="info-item"><span>💰 예상 초임 연봉</span><strong id="mSalary">-</strong></div>
+          <div class="info-item"><span>📈 최근 연매출</span><strong id="mSales">-</strong></div>
+          <div class="info-item"><span>⭐ 현직자 평점</span><strong id="mRate" style="color:#f59e0b;">-</strong></div>
+        </div>
+        <div class="review-box">
+          <h4>📣 현직자 리얼 리뷰 (블라인드·크레딧잡 발췌)</h4>
+          <p id="mReview">-</p>
+        </div>
+        <div class="welfare-box">
+          <h4>🎁 대표 핵심 복지 혜택</h4>
+          <p id="mWelfare">-</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="mLinkBtn" class="primary-btn">공식 채용관 / 홈페이지 바로가기 🔗</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
